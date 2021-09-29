@@ -197,8 +197,10 @@ def configure_logging(app):
     logfile = app.config.get("LOG_FILE", "lemur.log")
     # if the log file is a character special device file (ie. stdout/stderr),
     # file rotation will not work and must be disabled.
+    print(f'LOG_FILE={logfile}')
     disable_file_rotation = os.path.exists(logfile) and stat.S_ISCHR(os.stat(logfile).st_mode)
     if disable_file_rotation:
+        print('File rotation disabled')
         handler = StreamHandler(open(logfile, 'a'))
     else:
         handler = RotatingFileHandler(logfile, maxBytes=10000000, backupCount=100)
