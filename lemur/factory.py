@@ -195,9 +195,12 @@ def configure_logging(app):
     :param app:
     """
     logfile = app.config.get("LOG_FILE", "lemur.log")
-    # if the log file is a character special device file (ie. stdout/stderr),
+    disable_file_rotation = False
+    # if the log file is a character special device file or a named pipe (ie. stdout/stderr),
     # file rotation will not work and must be disabled.
-    disable_file_rotation = os.path.exists(logfile) and stat.S_ISCHR(os.stat(logfile).st_mode)
+    if os.path.exists(logfile):
+        logfile_st_mode = os.stat(logfile).st_mode
+        disable_file_rotation = stat.S_ISCHR(logfile_st_mode) or stat.S_ISFIFO(logfile_st_mode)
     if disable_file_rotation:
         handler = StreamHandler(open(logfile, 'a'))
     else:
